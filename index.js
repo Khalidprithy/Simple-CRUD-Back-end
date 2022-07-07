@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const { MongoClient, ServerApiVersion, MongoRuntimeError } = require('mongodb');
+const { MongoClient, ServerApiVersion, MongoRuntimeError, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
@@ -19,6 +19,19 @@ async function run() {
         await client.connect();
         const productCollection = client.db("simpleCrud").collection("products");
 
+        app.get('/products', async (req, res) => {
+            const query = {};
+            const cursor = productCollection.find(query);
+            const products = await cursor.toArray();
+            res.send(products);
+        })
+
+        app.get('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const product = await productCollection.findOne(query);
+            res.send(product);
+        })
     }
     finally {
         // await client.close();
@@ -35,7 +48,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log("Server is running")
 })
-
-
-// cruduser
-// naXJR4nVj*Wc6Ra
